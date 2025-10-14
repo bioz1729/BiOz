@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LED Timer Setup</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0a0a0a;
+      color: #fff;
+      text-align: center;
+      padding: 30px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 8px;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      background-color: #00b050;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #009640;
+    }
+    .card {
+      background: #1c1c1c;
+      padding: 25px;
+      border-radius: 12px;
+      display: inline-block;
+      box-shadow: 0 0 10px #00b050;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>LED Scheduler</h2>
+    <input type="text" id="device" placeholder="Device ID (eg: LED01)" required><br>
+    <input type="time" id="on_time" required><br>
+    <input type="time" id="off_time" required><br>
+    <button onclick="saveData()">Save</button>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    async function saveData() {
+      const device = document.getElementById('device').value;
+      const on_time = document.getElementById('on_time').value;
+      const off_time = document.getElementById('off_time').value;
+
+      if (!device || !on_time || !off_time) {
+        document.getElementById('status').innerText = "⚠️ Please fill all fields.";
+        return;
+      }
+
+      const data = {
+        "data": [
+          {
+            "Device": device,
+            "On_Time": on_time,
+            "Off_Time": off_time
+          }
+        ]
+      };
+
+      const sheet_api_url = "YOUR_ZOHO_SHEET_API_URL_HERE"; // 👈 Replace this
+
+      try {
+        const response = await fetch(sheet_api_url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        if (response.ok) {
+          document.getElementById('status').innerText = "✅ Data saved to Zoho Sheet!";
+        } else {
+          document.getElementById('status').innerText = "❌ Failed to save.";
+        }
+      } catch (e) {
+        document.getElementById('status').innerText = "⚠️ Network error!";
+      }
+    }
+  </script>
+</body>
+</html>
